@@ -1,9 +1,9 @@
 import { getRepository, getCustomRepository } from 'typeorm';
 
-import Telephone from '../models/Telephone';
 import Contact from '../models/Contact';
 import ClientsRepository from '../repositories/ClientsRepository';
 import TelephonesRepository from '../repositories/TelephonesRepository';
+import AppError from '../errors/AppError';
 
 interface Request {
   name: string;
@@ -31,18 +31,19 @@ class CreateContactService {
     const telephoneExists = await telephonesRepository.findTelephone(telephone);
 
     if (telephoneExists) {
-      throw new Error(
+      throw new AppError(
         'You can not add a contact if the telephone already is used.',
+        400,
       );
     }
 
     /* Checking if contact email has inside client table */
     if (checkEmailClientEqualContact) {
-      throw new Error('E-mail already is used.');
+      throw new AppError('E-mail already is used.', 400);
     }
 
     if (!checkClientExists) {
-      throw Error('The client does not exist.');
+      throw new AppError('The client does not exist.', 400);
     }
 
     const checkContactExists = await contactsRepository.findOne({
@@ -50,7 +51,7 @@ class CreateContactService {
     });
 
     if (checkContactExists) {
-      throw new Error('Email address already used.');
+      throw new AppError('Email address already used.', 400);
     }
 
     const contact = contactsRepository.create({
@@ -64,7 +65,7 @@ class CreateContactService {
 
     const telephoneNumber = telephonesRepository.create({
       telephone_number: telephone,
-      owner_id,
+      contact_id: contact.id,
     });
 
     await telephonesRepository.save(telephoneNumber);

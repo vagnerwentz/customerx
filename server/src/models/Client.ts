@@ -4,7 +4,9 @@ import {
   Entity,
   CreateDateColumn,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
+import Telephone from './Telephone';
 
 @Entity('clients')
 class Client {
@@ -18,8 +20,13 @@ class Client {
   email: string;
 
   @Column()
-  @JoinColumn({ name: 'telephone_number' })
   telephone: string;
+
+  @OneToMany(() => Telephone, telephone => telephone.client, {
+    eager: true,
+  })
+  @JoinColumn({ name: 'telephone_number' })
+  telephone_array: Telephone[];
 
   @CreateDateColumn()
   created_at: Date;

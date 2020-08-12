@@ -5,6 +5,7 @@ import { sign } from 'jsonwebtoken';
 import authConfig from '../config/auth';
 
 import Admin from '../models/Admin';
+import AppError from '../errors/AppError';
 
 interface Request {
   email: string;
@@ -25,13 +26,13 @@ class AuthenticateAdminService {
     });
 
     if (!admin) {
-      throw new Error('Incorrect email/password combination.');
+      throw new AppError('Incorrect email/password combination.', 200);
     }
 
     const passwordMatched = await compare(password, admin.password);
 
     if (!passwordMatched) {
-      throw new Error('Incorrect email/password combination.');
+      throw new AppError('Incorrect email/password combination.', 200);
     }
 
     const { secret, expiresIn } = authConfig.jwt;

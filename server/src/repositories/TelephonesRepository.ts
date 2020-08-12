@@ -11,6 +11,14 @@ class TelephonesRepository extends Repository<Telephone> {
 
     return findTelephone || null;
   }
+
+  public async findAllClientsTelephone(): Promise<Telephone[]> {
+    const findAllClientsAtTelephones = await this.find({
+      where: { contact_id: null },
+    });
+
+    return findAllClientsAtTelephones;
+  }
 }
 
 export default TelephonesRepository;

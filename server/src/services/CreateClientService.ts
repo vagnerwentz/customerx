@@ -4,6 +4,7 @@ import Client from '../models/Client';
 
 import ClientsRepository from '../repositories/ClientsRepository';
 import TelephonesRepository from '../repositories/TelephonesRepository';
+import AppError from '../errors/AppError';
 
 interface Request {
   name: string;
@@ -21,12 +22,13 @@ class CreateClientService {
     const findTelephone = await telephonesRepository.findTelephone(telephone);
 
     if (findClientWithSameEmail) {
-      throw Error('This e-mail is already used.');
+      throw new AppError('This e-mail is already used.', 400);
     }
 
     if (findTelephone) {
-      throw Error(
+      throw new AppError(
         'This telephone number is already used and can not be the same.',
+        400,
       );
     }
 
@@ -40,7 +42,7 @@ class CreateClientService {
 
     const telephoneNumber = telephonesRepository.create({
       telephone_number: telephone,
-      owner_id: client.id,
+      client_id: client.id,
     });
 
     await telephonesRepository.save(telephoneNumber);

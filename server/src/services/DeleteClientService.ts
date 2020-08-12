@@ -1,7 +1,7 @@
 import { getCustomRepository } from 'typeorm';
 
 import ClientsRepository from '../repositories/ClientsRepository';
-import TelephonesRepository from '../repositories/TelephonesRepository';
+import AppError from '../errors/AppError';
 
 interface Request {
   id: string;
@@ -10,12 +10,11 @@ interface Request {
 class DeleteClientService {
   public async execute({ id }: Request): Promise<void> {
     const clientsRepository = getCustomRepository(ClientsRepository);
-    const telephonesRepository = getCustomRepository(TelephonesRepository);
 
     const client = await clientsRepository.findOne(id);
 
     if (!client) {
-      throw Error('This client does not exists');
+      throw new AppError('This client does not exists', 400);
     }
 
     await clientsRepository.remove(client);

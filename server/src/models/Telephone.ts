@@ -17,10 +17,19 @@ class Telephone {
   @Column()
   telephone_number: string;
 
+  @Column()
+  client_id: string;
+
   @ManyToOne(() => Client, client => client.id)
+  @JoinColumn({ name: 'client_id' })
+  client: Client;
+
+  @Column()
+  contact_id: string;
+
   @ManyToOne(() => Contact, contact => contact.id)
-  @JoinColumn({ name: 'owner_id' })
-  owner_id: string;
+  @JoinColumn({ name: 'contact_id' })
+  contact: Contact;
 }
 
 export default Telephone;

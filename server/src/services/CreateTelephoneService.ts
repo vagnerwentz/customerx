@@ -3,6 +3,7 @@ import { getCustomRepository } from 'typeorm';
 import TelephonesRepository from '../repositories/TelephonesRepository';
 import ClientsRepository from '../repositories/ClientsRepository';
 import ContactsRepository from '../repositories/ContactsRepository';
+import AppError from '../errors/AppError';
 
 interface Request {
   owner_id: string;
@@ -15,36 +16,37 @@ class CreateTelephoneService {
     const clientsRepository = getCustomRepository(ClientsRepository);
     const contactsRepository = getCustomRepository(ContactsRepository);
 
-    const isContact = await clientsRepository.findClient(owner_id);
+    const isClient = await clientsRepository.findClient(owner_id);
 
-    const isClient = await contactsRepository.findContact(owner_id);
+    const isContact = await contactsRepository.findContact(owner_id);
 
     const findTelephone = await telephonesRepository.findTelephone(
       telephone_number,
     );
 
     if (findTelephone) {
-      throw Error(
+      throw new AppError(
         'This telephone number is already used and can not be the same.',
+        400,
       );
     }
 
     if (isContact) {
       const telephoneContact = telephonesRepository.create({
-        owner_id,
+        contact_id: owner_id,
         telephone_number,
       });
 
       await telephonesRepository.save(telephoneContact);
     } else if (isClient) {
       const telephoneClient = telephonesRepository.create({
-        owner_id,
+        client_id: owner_id,
         telephone_number,
       });
 
       await telephonesRepository.save(telephoneClient);
     } else if (!isContact && !isClient) {
-      throw new Error("We can't found the id");
+      throw new AppError("We can't found the id", 400);
     }
   }
 }

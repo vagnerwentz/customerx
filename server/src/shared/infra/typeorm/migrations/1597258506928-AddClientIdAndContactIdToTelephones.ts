@@ -5,15 +5,15 @@ import {
   TableForeignKey,
 } from 'typeorm';
 
-export default class AddOwnerIdToTelephones1597250413640
+export default class AddClientIdAndContactIdToTelephones1597258506928
   implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.addColumn(
       'telephones',
       new TableColumn({
-        name: 'owner_id',
+        name: 'client_id',
         type: 'uuid',
-        isNullable: false,
+        isNullable: true,
       }),
     );
 
@@ -21,7 +21,7 @@ export default class AddOwnerIdToTelephones1597250413640
       'telephones',
       new TableForeignKey({
         name: 'TelephoneClient',
-        columnNames: ['owner_id'],
+        columnNames: ['client_id'],
         referencedColumnNames: ['id'],
         referencedTableName: 'clients',
         onDelete: 'CASCADE',
@@ -29,11 +29,20 @@ export default class AddOwnerIdToTelephones1597250413640
       }),
     );
 
+    await queryRunner.addColumn(
+      'telephones',
+      new TableColumn({
+        name: 'contact_id',
+        type: 'uuid',
+        isNullable: true,
+      }),
+    );
+
     await queryRunner.createForeignKey(
       'telephones',
       new TableForeignKey({
         name: 'TelephoneContact',
-        columnNames: ['owner_id'],
+        columnNames: ['contact_id'],
         referencedColumnNames: ['id'],
         referencedTableName: 'contacts',
         onDelete: 'CASCADE',
@@ -45,6 +54,7 @@ export default class AddOwnerIdToTelephones1597250413640
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.dropForeignKey('telephones', 'TelephoneContact');
     await queryRunner.dropForeignKey('telephones', 'TelephoneClient');
-    await queryRunner.dropColumn('telephones', 'owner_id');
+    await queryRunner.dropColumn('telephones', 'contact_id');
+    await queryRunner.dropColumn('telephones', 'client_id');
   }
 }
