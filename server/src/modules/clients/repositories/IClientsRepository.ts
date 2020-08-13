@@ -3,8 +3,8 @@ import ICreateClientDTO from '../dtos/ICreateClientDTO';
 
 export default interface IClientsRepository {
   createClient(data: ICreateClientDTO): Promise<Client>;
-  findEmail(email: string): Promise<Client | null>;
-  findClient(id: string): Promise<Client | null>;
+  findEmail(email: string): Promise<Client | undefined>;
+  findClient(id: string): Promise<Client | undefined>;
   deleteClient(id: string): Promise<boolean>;
   saveClient(client: Client): Promise<Client>;
   listClient(): Promise<Client[]>;

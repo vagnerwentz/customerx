@@ -13,12 +13,10 @@ const contactsRouter = Router();
 
 contactsRouter.use(ensureAuthenticated);
 
-const contactsRepository = new ContactsRepository();
-const clientsRepository = new ClientsRepository();
-const telephonesRepository = new TelephonesRepository();
-
 /* Get all contacts with the telephones and client */
 contactsRouter.get('/', async (request, response) => {
+  const contactsRepository = new ContactsRepository();
+
   const listContact = new ListContactsService(contactsRepository);
 
   const contacts = await listContact.execute();
@@ -29,6 +27,10 @@ contactsRouter.get('/', async (request, response) => {
 contactsRouter.post('/', async (request, response) => {
   try {
     const { name, email, telephone, client_id } = request.body;
+
+    const contactsRepository = new ContactsRepository();
+    const clientsRepository = new ClientsRepository();
+    const telephonesRepository = new TelephonesRepository();
 
     const createContact = new CreateContactService(
       contactsRepository,
@@ -53,6 +55,8 @@ contactsRouter.post('/', async (request, response) => {
 contactsRouter.delete('/:id', async (request, response) => {
   const { id } = request.params;
 
+  const contactsRepository = new ContactsRepository();
+
   const deleteContact = new DeleteContactService(contactsRepository);
 
   await deleteContact.execute({
@@ -66,13 +70,18 @@ contactsRouter.put('/:id', async (request, response) => {
   const { id } = request.params;
   const { name, email, telephone } = request.body;
 
-  const updateClient = new UpdateContactService(
-    clientsRepository,
-    telephonesRepository,
-    contactsRepository,
-  );
-
   try {
+    const contactsRepository = new ContactsRepository();
+
+    const clientsRepository = new ClientsRepository();
+    const telephonesRepository = new TelephonesRepository();
+
+    const updateClient = new UpdateContactService(
+      clientsRepository,
+      telephonesRepository,
+      contactsRepository,
+    );
+
     await updateClient.execute({
       contact_id: id,
       name,

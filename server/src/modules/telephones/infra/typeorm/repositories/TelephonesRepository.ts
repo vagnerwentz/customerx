@@ -13,12 +13,14 @@ class TelephonesRepository implements ITelephonesRepository {
   }
 
   /* Find the same telephone */
-  public async findTelephone(telephone: string): Promise<Telephone | null> {
+  public async findTelephone(
+    telephone: string,
+  ): Promise<Telephone | undefined> {
     const findTelephone = await this.ormRepository.findOne({
       where: { telephone_number: telephone },
     });
 
-    return findTelephone || null;
+    return findTelephone;
   }
 
   public async findAllClientsTelephone(): Promise<Telephone[]> {

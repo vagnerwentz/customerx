@@ -1,4 +1,4 @@
-import { Repository } from 'typeorm';
+import { Repository, getRepository } from 'typeorm';
 import IContactsRepository from '@modules/contacts/repositories/IContactsRepository';
 import ICreateContactDTO from '@modules/contacts/dtos/ICreateContactDTO';
 import Contact from '../entities/Contact';
@@ -6,23 +6,23 @@ import Contact from '../entities/Contact';
 class ContactsRepository implements IContactsRepository {
   private ormRepository: Repository<Contact>;
 
+  constructor() {
+    this.ormRepository = getRepository(Contact);
+  }
+
   /* Find the same email */
-  public async findEmail(email: string): Promise<Contact | null> {
+  public async findEmail(email: string): Promise<Contact | undefined> {
     const findContact = await this.ormRepository.findOne({
       where: { email },
     });
 
-    return findContact || null;
+    return findContact;
   }
 
-  public async findContact(id: string): Promise<Contact | null> {
-    const contact = await this.ormRepository.findOne({
-      where: {
-        id,
-      },
-    });
+  public async findContact(id: string): Promise<Contact | undefined> {
+    const contact = await this.ormRepository.findOne(id);
 
-    return contact || null;
+    return contact;
   }
 
   public async createContact({

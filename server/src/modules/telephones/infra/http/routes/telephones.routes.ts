@@ -11,12 +11,11 @@ const telephonesRouter = Router();
 
 telephonesRouter.use(ensureAuthenticated);
 
-const telephonesRepository = new TelephonesRepository();
-const clientsRepository = new ClientsRepository();
-const contactsRepository = new ContactsRepository();
-
 telephonesRouter.post('/', async (request, response) => {
   try {
+    const telephonesRepository = new TelephonesRepository();
+    const clientsRepository = new ClientsRepository();
+    const contactsRepository = new ContactsRepository();
     const { telephone_number, owner_id } = request.body;
 
     const telephoneService = new CreateTelephoneService(

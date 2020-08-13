@@ -15,12 +15,10 @@ const clientsRouter = Router();
 
 clientsRouter.use(ensureAuthenticated);
 
-const clientsRepository = new ClientsRepository();
-const telephonesRepository = new TelephonesRepository();
-const contactsRepository = new ContactsRepository();
-
 /* Get all clients with the telephones */
 clientsRouter.get('/', async (request, response) => {
+  const clientsRepository = new ClientsRepository();
+
   const listClients = new ListClientService(clientsRepository);
 
   const clients = await listClients.execute();
@@ -32,6 +30,9 @@ clientsRouter.get('/', async (request, response) => {
 clientsRouter.post('/', async (request, response) => {
   try {
     const { name, email, telephone } = request.body;
+
+    const clientsRepository = new ClientsRepository();
+    const telephonesRepository = new TelephonesRepository();
 
     const createClient = new CreateClientService(
       clientsRepository,
@@ -54,6 +55,8 @@ clientsRouter.post('/', async (request, response) => {
 clientsRouter.delete('/:id', async (request, response) => {
   const { id } = request.params;
 
+  const clientsRepository = new ClientsRepository();
+
   const deleteClient = new DeleteClientService(clientsRepository);
 
   await deleteClient.execute({
@@ -67,13 +70,16 @@ clientsRouter.put('/:id', async (request, response) => {
   const { id } = request.params;
   const { name, email, telephone } = request.body;
 
-  const updateClient = new UpdateClientService(
-    clientsRepository,
-    telephonesRepository,
-    contactsRepository,
-  );
-
   try {
+    const contactsRepository = new ContactsRepository();
+    const clientsRepository = new ClientsRepository();
+    const telephonesRepository = new TelephonesRepository();
+
+    const updateClient = new UpdateClientService(
+      clientsRepository,
+      telephonesRepository,
+      contactsRepository,
+    );
     await updateClient.execute({
       client_id: id,
       name,

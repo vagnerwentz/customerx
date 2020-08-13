@@ -12,22 +12,18 @@ class ClientsRepository implements IClientsRepository {
   }
 
   /* Find the same email */
-  public async findEmail(email: string): Promise<Client | null> {
+  public async findEmail(email: string): Promise<Client | undefined> {
     const findClient = await this.ormRepository.findOne({
       where: { email },
     });
 
-    return findClient || null;
+    return findClient;
   }
 
-  public async findClient(id: string): Promise<Client | null> {
-    const client = await this.ormRepository.findOne({
-      where: {
-        id,
-      },
-    });
+  public async findClient(id: string): Promise<Client | undefined> {
+    const client = await this.ormRepository.findOne(id);
 
-    return client || null;
+    return client;
   }
 
   public async createClient({

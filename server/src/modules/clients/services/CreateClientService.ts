@@ -22,7 +22,7 @@ class CreateClientService {
       email,
     );
 
-    if (findClientWithSameEmail) {
+    if (findClientWithSameEmail !== undefined) {
       throw new AppError('This e-mail is already used.', 400);
     }
 
@@ -30,7 +30,7 @@ class CreateClientService {
       telephone,
     );
 
-    if (findTelephone) {
+    if (findTelephone !== undefined) {
       throw new AppError(
         'This telephone number is already used and can not be the same.',
         400,
@@ -44,8 +44,8 @@ class CreateClientService {
     });
 
     await this.telephonesRepository.createTelephoneClient({
-      telephone_number: telephone,
       owner_id: client.id,
+      telephone_number: telephone,
     });
 
     return client;
