@@ -1,10 +1,9 @@
-import { getCustomRepository } from 'typeorm';
-
 import Client from '@modules/clients/infra/typeorm/entities/Client';
 
-import ClientsRepository from '@modules/clients/infra/typeorm/repositories/ClientsRepository';
-import TelephonesRepository from '@modules/telephones/infra/typeorm/repositories/TelephonesRepository';
 import AppError from '@shared/errors/AppError';
+
+import ITelephonesRepository from '@modules/telephones/repositories/ITelephonesRepository';
+import IClientsRepository from '../repositories/IClientsRepository';
 
 interface Request {
   name: string;
@@ -13,17 +12,23 @@ interface Request {
 }
 
 class CreateClientService {
+  constructor(
+    private clientsRepository: IClientsRepository,
+    private telephonesRepository: ITelephonesRepository,
+  ) {}
+
   public async execute({ name, email, telephone }: Request): Promise<Client> {
-    const clientsRepository = getCustomRepository(ClientsRepository);
-    const telephonesRepository = getCustomRepository(TelephonesRepository);
-
-    const findClientWithSameEmail = await clientsRepository.findEmail(email);
-
-    const findTelephone = await telephonesRepository.findTelephone(telephone);
+    const findClientWithSameEmail = await this.clientsRepository.findEmail(
+      email,
+    );
 
     if (findClientWithSameEmail) {
       throw new AppError('This e-mail is already used.', 400);
     }
+
+    const findTelephone = await this.telephonesRepository.findTelephone(
+      telephone,
+    );
 
     if (findTelephone) {
       throw new AppError(
@@ -32,20 +37,16 @@ class CreateClientService {
       );
     }
 
-    const client = clientsRepository.create({
+    const client = await this.clientsRepository.createClient({
       name,
       email,
       telephone,
     });
 
-    await clientsRepository.save(client);
-
-    const telephoneNumber = telephonesRepository.create({
+    await this.telephonesRepository.createTelephoneClient({
       telephone_number: telephone,
-      client_id: client.id,
+      owner_id: client.id,
     });
-
-    await telephonesRepository.save(telephoneNumber);
 
     return client;
   }

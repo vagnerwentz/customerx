@@ -1,15 +1,20 @@
-import { EntityRepository, Repository } from 'typeorm';
+import { Repository, getRepository } from 'typeorm';
 
 import ITelephonesRepository from '@modules/telephones/repositories/ITelephonesRepository';
 
+import ICreateTelephoneDTO from '@modules/telephones/dtos/ICreateTelephoneDTO';
 import Telephone from '../entities/Telephone';
 
-@EntityRepository(Telephone)
-class TelephonesRepository extends Repository<Telephone>
-  implements ITelephonesRepository {
+class TelephonesRepository implements ITelephonesRepository {
+  private ormRepository: Repository<Telephone>;
+
+  constructor() {
+    this.ormRepository = getRepository(Telephone);
+  }
+
   /* Find the same telephone */
   public async findTelephone(telephone: string): Promise<Telephone | null> {
-    const findTelephone = await this.findOne({
+    const findTelephone = await this.ormRepository.findOne({
       where: { telephone_number: telephone },
     });
 
@@ -17,11 +22,39 @@ class TelephonesRepository extends Repository<Telephone>
   }
 
   public async findAllClientsTelephone(): Promise<Telephone[]> {
-    const findAllClientsAtTelephones = await this.find({
+    const findAllClientsAtTelephones = await this.ormRepository.find({
       where: { contact_id: null },
     });
 
     return findAllClientsAtTelephones;
+  }
+
+  public async createTelephoneClient({
+    owner_id,
+    telephone_number,
+  }: ICreateTelephoneDTO): Promise<Telephone> {
+    const telephone = this.ormRepository.create({
+      telephone_number,
+      client_id: owner_id,
+    });
+
+    await this.ormRepository.save(telephone);
+
+    return telephone;
+  }
+
+  public async createTelephoneContact({
+    owner_id,
+    telephone_number,
+  }: ICreateTelephoneDTO): Promise<Telephone> {
+    const telephone = this.ormRepository.create({
+      telephone_number,
+      contact_id: owner_id,
+    });
+
+    await this.ormRepository.save(telephone);
+
+    return telephone;
   }
 }
 

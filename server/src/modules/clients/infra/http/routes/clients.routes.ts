@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import { getCustomRepository } from 'typeorm';
 
 import ensureAuthenticated from '@modules/admins/infra/http/middlewares/ensureAuthenticated';
 
@@ -8,16 +7,23 @@ import DeleteClientService from '@modules/clients/services/DeleteClientService';
 import UpdateClientService from '@modules/clients/services/UpdateClientService';
 
 import ClientsRepository from '@modules/clients/infra/typeorm/repositories/ClientsRepository';
+import TelephonesRepository from '@modules/telephones/infra/typeorm/repositories/TelephonesRepository';
+import ListClientService from '@modules/clients/services/ListClientService';
+import ContactsRepository from '@modules/contacts/infra/typeorm/repositories/ContactsRepository';
 
 const clientsRouter = Router();
 
 clientsRouter.use(ensureAuthenticated);
 
+const clientsRepository = new ClientsRepository();
+const telephonesRepository = new TelephonesRepository();
+const contactsRepository = new ContactsRepository();
+
 /* Get all clients with the telephones */
 clientsRouter.get('/', async (request, response) => {
-  const clientsRepository = getCustomRepository(ClientsRepository);
+  const listClients = new ListClientService(clientsRepository);
 
-  const clients = await clientsRepository.find();
+  const clients = await listClients.execute();
 
   return response.json({ clients });
 });
@@ -27,7 +33,10 @@ clientsRouter.post('/', async (request, response) => {
   try {
     const { name, email, telephone } = request.body;
 
-    const createClient = new CreateClientService();
+    const createClient = new CreateClientService(
+      clientsRepository,
+      telephonesRepository,
+    );
 
     const client = await createClient.execute({
       name,
@@ -45,7 +54,7 @@ clientsRouter.post('/', async (request, response) => {
 clientsRouter.delete('/:id', async (request, response) => {
   const { id } = request.params;
 
-  const deleteClient = new DeleteClientService();
+  const deleteClient = new DeleteClientService(clientsRepository);
 
   await deleteClient.execute({
     id,
@@ -58,7 +67,11 @@ clientsRouter.put('/:id', async (request, response) => {
   const { id } = request.params;
   const { name, email, telephone } = request.body;
 
-  const updateClient = new UpdateClientService();
+  const updateClient = new UpdateClientService(
+    clientsRepository,
+    telephonesRepository,
+    contactsRepository,
+  );
 
   try {
     await updateClient.execute({

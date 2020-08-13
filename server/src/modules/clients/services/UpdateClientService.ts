@@ -1,10 +1,8 @@
-import { getCustomRepository } from 'typeorm';
-
-import ClientsRepository from '@modules/clients/infra/typeorm/repositories/ClientsRepository';
-import TelephonesRepository from '@modules/telephones/infra/typeorm/repositories/TelephonesRepository';
-import ContactsRepository from '@modules/contacts/infra/typeorm/repositories/ContactsRepository';
 import AppError from '@shared/errors/AppError';
+import ITelephonesRepository from '@modules/telephones/repositories/ITelephonesRepository';
+import IContactsRepository from '@modules/contacts/repositories/IContactsRepository';
 import Client from '../infra/typeorm/entities/Client';
+import IClientsRepository from '../repositories/IClientsRepository';
 
 interface Request {
   client_id: string;
@@ -14,23 +12,28 @@ interface Request {
 }
 
 class UpdateClientService {
+  constructor(
+    private clientsRepository: IClientsRepository,
+    private telephonesRepository: ITelephonesRepository,
+    private contactsRepository: IContactsRepository,
+  ) {}
+
   public async execute({
     client_id,
     name,
     email,
     telephone,
   }: Request): Promise<Client> {
-    const clientsRepository = getCustomRepository(ClientsRepository);
-    const telephonesRepository = getCustomRepository(TelephonesRepository);
-    const contactsRepository = getCustomRepository(ContactsRepository);
-    const client = await clientsRepository.findClient(client_id);
+    const client = await this.clientsRepository.findClient(client_id);
 
     if (!client) {
       throw new AppError('Client not found');
     }
 
-    const clientWithUpdatedEmail = await clientsRepository.findEmail(email);
-    const checkIfEmailAlreadyExistsAtContact = await contactsRepository.findEmail(
+    const clientWithUpdatedEmail = await this.clientsRepository.findEmail(
+      email,
+    );
+    const checkIfEmailAlreadyExistsAtContact = await this.contactsRepository.findEmail(
       email,
     );
 
@@ -42,7 +45,7 @@ class UpdateClientService {
       throw new AppError('E-mail already in use.', 400);
     }
 
-    const clientWithUpdatedTelephone = await telephonesRepository.findTelephone(
+    const clientWithUpdatedTelephone = await this.telephonesRepository.findTelephone(
       telephone,
     );
 
@@ -54,7 +57,7 @@ class UpdateClientService {
     client.email = email;
     client.telephone = telephone;
 
-    return clientsRepository.save(client);
+    return this.clientsRepository.saveClient(client);
   }
 }
 

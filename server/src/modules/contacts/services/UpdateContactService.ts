@@ -1,10 +1,8 @@
-import { getCustomRepository } from 'typeorm';
-
-import ClientsRepository from '@modules/clients/infra/typeorm/repositories/ClientsRepository';
-import TelephonesRepository from '@modules/telephones/infra/typeorm/repositories/TelephonesRepository';
-import ContactsRepository from '@modules/contacts/infra/typeorm/repositories/ContactsRepository';
 import AppError from '@shared/errors/AppError';
-import Client from '@modules/clients/infra/typeorm/entities/Client';
+import Contact from '@modules/contacts/infra/typeorm/entities/Contact';
+import IClientsRepository from '@modules/clients/repositories/IClientsRepository';
+import ITelephonesRepository from '@modules/telephones/repositories/ITelephonesRepository';
+import IContactsRepository from '../repositories/IContactsRepository';
 
 interface Request {
   contact_id: string;
@@ -14,23 +12,28 @@ interface Request {
 }
 
 class UpdateContactService {
+  constructor(
+    private clientsRepository: IClientsRepository,
+    private telephonesRepository: ITelephonesRepository,
+    private contactsRepository: IContactsRepository,
+  ) {}
+
   public async execute({
     contact_id,
     name,
     email,
     telephone,
   }: Request): Promise<Contact> {
-    const clientsRepository = getCustomRepository(ClientsRepository);
-    const telephonesRepository = getCustomRepository(TelephonesRepository);
-    const contactsRepository = getCustomRepository(ContactsRepository);
-    const contact = await contactsRepository.findContact(contact_id);
+    const contact = await this.contactsRepository.findContact(contact_id);
 
     if (!contact) {
       throw new AppError('Contact not found');
     }
 
-    const contactWithUpdatedEmail = await contactsRepository.findEmail(email);
-    const checkIfEmailAlreadyExistsAtClient = await clientsRepository.findEmail(
+    const contactWithUpdatedEmail = await this.contactsRepository.findEmail(
+      email,
+    );
+    const checkIfEmailAlreadyExistsAtClient = await this.clientsRepository.findEmail(
       email,
     );
 
@@ -42,7 +45,7 @@ class UpdateContactService {
       throw new AppError('E-mail already in use.', 400);
     }
 
-    const contactWithUpdatedTelephone = await telephonesRepository.findTelephone(
+    const contactWithUpdatedTelephone = await this.telephonesRepository.findTelephone(
       telephone,
     );
 
@@ -54,7 +57,7 @@ class UpdateContactService {
     contact.email = email;
     contact.telephone = telephone;
 
-    return contactsRepository.save(contact);
+    return this.contactsRepository.saveContact(contact);
   }
 }
 

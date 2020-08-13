@@ -1,23 +1,21 @@
-import { getCustomRepository } from 'typeorm';
-
 import AppError from '@shared/errors/AppError';
-import ContactsRepository from '../infra/typeorm/repositories/ContactsRepository';
+import IContactsRepository from '../repositories/IContactsRepository';
 
 interface Request {
   id: string;
 }
 
 class DeleteContactService {
-  public async execute({ id }: Request): Promise<void> {
-    const contactsRepository = getCustomRepository(ContactsRepository);
+  constructor(private contactsRepository: IContactsRepository) {}
 
-    const contact = await contactsRepository.findOne(id);
+  public async execute({ id }: Request): Promise<void> {
+    const contact = await this.contactsRepository.findContact(id);
 
     if (!contact) {
       throw new AppError('This contact does not exists', 400);
     }
 
-    await contactsRepository.remove(contact);
+    await this.contactsRepository.deleteContact(contact.id);
   }
 }
 

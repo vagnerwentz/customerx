@@ -1,9 +1,8 @@
-import { getRepository, getCustomRepository } from 'typeorm';
-
 import AppError from '@shared/errors/AppError';
-import ClientsRepository from '@modules/clients/infra/typeorm/repositories/ClientsRepository';
-import TelephonesRepository from '@modules/telephones/infra/typeorm/repositories/TelephonesRepository';
+import IClientsRepository from '@modules/clients/repositories/IClientsRepository';
+import ITelephonesRepository from '@modules/telephones/repositories/ITelephonesRepository';
 import Contact from '../infra/typeorm/entities/Contact';
+import IContactsRepository from '../repositories/IContactsRepository';
 
 interface Request {
   name: string;
@@ -13,22 +12,28 @@ interface Request {
 }
 
 class CreateContactService {
+  constructor(
+    private contactsRepository: IContactsRepository,
+    private clientsRepository: IClientsRepository,
+    private telephonesRepository: ITelephonesRepository,
+  ) {}
+
   async execute({
     name,
     email,
     telephone,
     client_id,
   }: Request): Promise<Contact> {
-    const contactsRepository = getRepository(Contact);
-    const clientsRepository = getCustomRepository(ClientsRepository);
-    const telephonesRepository = getCustomRepository(TelephonesRepository);
-
-    const checkClientExists = await clientsRepository.findClient(client_id);
-    const checkEmailClientEqualContact = await clientsRepository.findEmail(
+    const checkClientExists = await this.clientsRepository.findClient(
+      client_id,
+    );
+    const checkEmailClientEqualContact = await this.clientsRepository.findEmail(
       email,
     );
 
-    const telephoneExists = await telephonesRepository.findTelephone(telephone);
+    const telephoneExists = await this.telephonesRepository.findTelephone(
+      telephone,
+    );
 
     if (telephoneExists) {
       throw new AppError(
@@ -46,29 +51,23 @@ class CreateContactService {
       throw new AppError('The client does not exist.', 400);
     }
 
-    const checkContactExists = await contactsRepository.findOne({
-      where: { email },
-    });
+    const checkContactEmail = await this.contactsRepository.findEmail(email);
 
-    if (checkContactExists) {
+    if (checkContactEmail) {
       throw new AppError('Email address already used.', 400);
     }
 
-    const contact = contactsRepository.create({
+    const contact = await this.contactsRepository.createContact({
       name,
       email,
       telephone,
       client_id,
     });
 
-    await contactsRepository.save(contact);
-
-    const telephoneNumber = telephonesRepository.create({
+    this.telephonesRepository.createTelephoneContact({
       telephone_number: telephone,
-      contact_id: contact.id,
+      owner_id: contact.id,
     });
-
-    await telephonesRepository.save(telephoneNumber);
 
     return contact;
   }

@@ -1,26 +1,31 @@
-import { getCustomRepository } from 'typeorm';
-
-import TelephonesRepository from '@modules/telephones/infra/typeorm/repositories/TelephonesRepository';
-import ClientsRepository from '@modules/clients/infra/typeorm/repositories/ClientsRepository';
-import ContactsRepository from '@modules/contacts/infra/typeorm/repositories/ContactsRepository';
 import AppError from '@shared/errors/AppError';
 
-interface Request {
+/* Interface */
+import IClientsRepository from '@modules/clients/repositories/IClientsRepository';
+import IContactsRepository from '@modules/contacts/repositories/IContactsRepository';
+import ITelephonesRepository from '../repositories/ITelephonesRepository';
+
+interface IRequest {
   owner_id: string;
   telephone_number: string;
 }
 
 class CreateTelephoneService {
-  public async execute({ owner_id, telephone_number }: Request): Promise<void> {
-    const telephonesRepository = getCustomRepository(TelephonesRepository);
-    const clientsRepository = getCustomRepository(ClientsRepository);
-    const contactsRepository = getCustomRepository(ContactsRepository);
+  constructor(
+    private telephonesRepository: ITelephonesRepository,
+    private clientsRepository: IClientsRepository,
+    private contactsRepository: IContactsRepository,
+  ) {}
 
-    const isClient = await clientsRepository.findClient(owner_id);
+  public async execute({
+    owner_id,
+    telephone_number,
+  }: IRequest): Promise<void> {
+    const isClient = await this.clientsRepository.findClient(owner_id);
 
-    const isContact = await contactsRepository.findContact(owner_id);
+    const isContact = await this.contactsRepository.findContact(owner_id);
 
-    const findTelephone = await telephonesRepository.findTelephone(
+    const findTelephone = await this.telephonesRepository.findTelephone(
       telephone_number,
     );
 
@@ -32,19 +37,15 @@ class CreateTelephoneService {
     }
 
     if (isContact) {
-      const telephoneContact = telephonesRepository.create({
-        contact_id: owner_id,
+      await this.telephonesRepository.createTelephoneContact({
+        owner_id,
         telephone_number,
       });
-
-      await telephonesRepository.save(telephoneContact);
     } else if (isClient) {
-      const telephoneClient = telephonesRepository.create({
-        client_id: owner_id,
+      await this.telephonesRepository.createTelephoneClient({
+        owner_id,
         telephone_number,
       });
-
-      await telephonesRepository.save(telephoneClient);
     } else if (!isContact && !isClient) {
       throw new AppError("We can't found the id", 400);
     }
