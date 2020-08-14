@@ -1,3 +1,5 @@
+import { injectable, inject } from 'tsyringe';
+
 import AppError from '@shared/errors/AppError';
 import IClientsRepository from '@modules/clients/repositories/IClientsRepository';
 import ITelephonesRepository from '@modules/telephones/repositories/ITelephonesRepository';
@@ -11,10 +13,16 @@ interface Request {
   client_id: string;
 }
 
+@injectable()
 class CreateContactService {
   constructor(
+    @inject('ContactsRepository')
     private contactsRepository: IContactsRepository,
+
+    @inject('ClientsRepository')
     private clientsRepository: IClientsRepository,
+
+    @inject('TelephonesRepository')
     private telephonesRepository: ITelephonesRepository,
   ) {}
 

@@ -1,98 +1,44 @@
 import { Router } from 'express';
+import { celebrate, Segments, Joi } from 'celebrate';
 
 import ensureAuthenticated from '@modules/admins/infra/http/middlewares/ensureAuthenticated';
-import CreateContactService from '@modules/contacts/services/CreateContactService';
-import DeleteContactService from '@modules/contacts/services/DeleteContactService';
-import ListContactsService from '@modules/contacts/services/ListContactsService';
-import UpdateContactService from '@modules/contacts/services/UpdateContactService';
-import ClientsRepository from '@modules/clients/infra/typeorm/repositories/ClientsRepository';
-import TelephonesRepository from '@modules/telephones/infra/typeorm/repositories/TelephonesRepository';
-import ContactsRepository from '../../typeorm/repositories/ContactsRepository';
+
+import ContactsController from '../controllers/ContactsController';
 
 const contactsRouter = Router();
 
 contactsRouter.use(ensureAuthenticated);
 
+const contactsController = new ContactsController();
+
 /* Get all contacts with the telephones and client */
-contactsRouter.get('/', async (request, response) => {
-  const contactsRepository = new ContactsRepository();
+contactsRouter.get('/', contactsController.index);
 
-  const listContact = new ListContactsService(contactsRepository);
-
-  const contacts = await listContact.execute();
-
-  return response.json({ contacts });
-});
-
-contactsRouter.post('/', async (request, response) => {
-  try {
-    const { name, email, telephone, client_id } = request.body;
-
-    const contactsRepository = new ContactsRepository();
-    const clientsRepository = new ClientsRepository();
-    const telephonesRepository = new TelephonesRepository();
-
-    const createContact = new CreateContactService(
-      contactsRepository,
-      clientsRepository,
-      telephonesRepository,
-    );
-
-    const contact = await createContact.execute({
-      name,
-      email,
-      telephone,
-      client_id,
-    });
-
-    return response.json(contact);
-  } catch (err) {
-    return response.status(400).json({ error: err.message });
-  }
-});
+contactsRouter.post(
+  '/',
+  celebrate({
+    [Segments.BODY]: {
+      name: Joi.string().required(),
+      telephone: Joi.string().required(),
+      email: Joi.string().email().required(),
+      client_id: Joi.string().uuid().required(),
+    },
+  }),
+  contactsController.create,
+);
 
 /* Delete a contact */
-contactsRouter.delete('/:id', async (request, response) => {
-  const { id } = request.params;
+contactsRouter.delete('/:id', contactsController.delete);
 
-  const contactsRepository = new ContactsRepository();
-
-  const deleteContact = new DeleteContactService(contactsRepository);
-
-  await deleteContact.execute({
-    id,
-  });
-
-  return response.status(204).send();
-});
-
-contactsRouter.put('/:id', async (request, response) => {
-  const { id } = request.params;
-  const { name, email, telephone } = request.body;
-
-  try {
-    const contactsRepository = new ContactsRepository();
-
-    const clientsRepository = new ClientsRepository();
-    const telephonesRepository = new TelephonesRepository();
-
-    const updateClient = new UpdateContactService(
-      clientsRepository,
-      telephonesRepository,
-      contactsRepository,
-    );
-
-    await updateClient.execute({
-      contact_id: id,
-      name,
-      email,
-      telephone,
-    });
-
-    return response.status(200).json({ success: 'Contact updated' });
-  } catch (err) {
-    return response.json({ error: err.message });
-  }
-});
+contactsRouter.put(
+  '/:id',
+  celebrate({
+    [Segments.BODY]: {
+      name: Joi.string(),
+      email: Joi.string().email(),
+    },
+  }),
+  contactsController.update,
+);
 
 export default contactsRouter;

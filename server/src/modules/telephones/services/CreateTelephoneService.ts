@@ -1,3 +1,5 @@
+import { injectable, inject } from 'tsyringe';
+
 import AppError from '@shared/errors/AppError';
 
 /* Interface */
@@ -10,10 +12,16 @@ interface IRequest {
   telephone_number: string;
 }
 
+@injectable()
 class CreateTelephoneService {
   constructor(
+    @inject('TelephonesRepository')
     private telephonesRepository: ITelephonesRepository,
+
+    @inject('ClientsRepository')
     private clientsRepository: IClientsRepository,
+
+    @inject('ContactsRepository')
     private contactsRepository: IContactsRepository,
   ) {}
 

@@ -1,3 +1,5 @@
+import { inject, injectable } from 'tsyringe';
+
 import AppError from '@shared/errors/AppError';
 import Contact from '@modules/contacts/infra/typeorm/entities/Contact';
 import IClientsRepository from '@modules/clients/repositories/IClientsRepository';
@@ -11,10 +13,16 @@ interface Request {
   telephone: string;
 }
 
+@injectable()
 class UpdateContactService {
   constructor(
+    @inject('ClientsRepository')
     private clientsRepository: IClientsRepository,
+
+    @inject('TelephonesRepository')
     private telephonesRepository: ITelephonesRepository,
+
+    @inject('ContactsRepository')
     private contactsRepository: IContactsRepository,
   ) {}
 

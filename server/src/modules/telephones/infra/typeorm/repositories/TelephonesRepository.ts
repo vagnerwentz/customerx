@@ -12,6 +12,40 @@ class TelephonesRepository implements ITelephonesRepository {
     this.ormRepository = getRepository(Telephone);
   }
 
+  public async updateClientTelephone(
+    telephone_id: string,
+    new_telephone: string,
+  ): Promise<Telephone | undefined> {
+    const updatedTelephone = await this.ormRepository.findOne({
+      where: { id: telephone_id },
+    });
+
+    if (updatedTelephone !== undefined) {
+      updatedTelephone.telephone_number = new_telephone;
+
+      await this.ormRepository.save(updatedTelephone);
+    }
+
+    return updatedTelephone;
+  }
+
+  public async updateContactTelephone(
+    telephone_id: string,
+    new_telephone: string,
+  ): Promise<Telephone | undefined> {
+    const updatedTelephone = await this.ormRepository.findOne({
+      where: { id: telephone_id },
+    });
+
+    if (updatedTelephone !== undefined) {
+      updatedTelephone.telephone_number = new_telephone;
+
+      await this.ormRepository.save(updatedTelephone);
+    }
+
+    return updatedTelephone;
+  }
+
   /* Find the same telephone */
   public async findTelephone(
     telephone: string,
@@ -57,6 +91,14 @@ class TelephonesRepository implements ITelephonesRepository {
     await this.ormRepository.save(telephone);
 
     return telephone;
+  }
+
+  public async deleteTelephone(telephone_number: string): Promise<boolean> {
+    const telephone = await this.ormRepository.delete({ telephone_number });
+
+    const isDeleted = !!telephone.affected;
+
+    return isDeleted;
   }
 }
 

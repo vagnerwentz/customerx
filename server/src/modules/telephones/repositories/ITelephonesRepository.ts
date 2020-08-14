@@ -6,4 +6,13 @@ export default interface ITelephonesRepository {
   createTelephoneClient(data: ICreateTelephoneDTO): Promise<Telephone>;
   findTelephone(telephone: string): Promise<Telephone | undefined>;
   findAllClientsTelephone(): Promise<Telephone[]>;
+  deleteTelephone(telephone_number: string): Promise<boolean>;
+  updateClientTelephone(
+    telephone_id: string,
+    new_telephone: string,
+  ): Promise<Telephone | undefined>;
+  updateContactTelephone(
+    telephone_id: string,
+    new_telephone: string,
+  ): Promise<Telephone | undefined>;
 }

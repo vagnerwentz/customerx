@@ -1,38 +1,27 @@
 import { Router } from 'express';
+import { celebrate, Segments, Joi } from 'celebrate';
 
 import ensureAuthenticated from '@modules/admins/infra/http/middlewares/ensureAuthenticated';
 
-import CreateTelephoneService from '@modules/telephones/services/CreateTelephoneService';
-import ClientsRepository from '@modules/clients/infra/typeorm/repositories/ClientsRepository';
-import ContactsRepository from '@modules/contacts/infra/typeorm/repositories/ContactsRepository';
-import TelephonesRepository from '../../typeorm/repositories/TelephonesRepository';
+import TelephonesController from '../controllers/TelephonesController';
 
 const telephonesRouter = Router();
 
+const telephonesController = new TelephonesController();
+
 telephonesRouter.use(ensureAuthenticated);
 
-telephonesRouter.post('/', async (request, response) => {
-  try {
-    const telephonesRepository = new TelephonesRepository();
-    const clientsRepository = new ClientsRepository();
-    const contactsRepository = new ContactsRepository();
-    const { telephone_number, owner_id } = request.body;
+telephonesRouter.post(
+  '/',
+  celebrate({
+    [Segments.BODY]: {
+      owner_id: Joi.string().required().uuid(),
+      telephone_number: Joi.string().required(),
+    },
+  }),
+  telephonesController.create,
+);
 
-    const telephoneService = new CreateTelephoneService(
-      telephonesRepository,
-      clientsRepository,
-      contactsRepository,
-    );
-
-    await telephoneService.execute({
-      owner_id,
-      telephone_number,
-    });
-
-    return response.status(204).send();
-  } catch (err) {
-    return response.status(400).json({ error: err.message });
-  }
-});
+telephonesRouter.delete('/', telephonesController.delete);
 
 export default telephonesRouter;

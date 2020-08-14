@@ -1,3 +1,5 @@
+import { inject, injectable } from 'tsyringe';
+
 import Client from '@modules/clients/infra/typeorm/entities/Client';
 
 import AppError from '@shared/errors/AppError';
@@ -11,9 +13,13 @@ interface Request {
   telephone: string;
 }
 
+@injectable()
 class CreateClientService {
   constructor(
+    @inject('ClientsRepository')
     private clientsRepository: IClientsRepository,
+
+    @inject('TelephonesRepository')
     private telephonesRepository: ITelephonesRepository,
   ) {}
 
