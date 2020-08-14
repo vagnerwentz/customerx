@@ -26,6 +26,7 @@
     "prettier/prettier": "error",
     "import/no-extraneous-dependencies": "off",
     "camelcase": "off",
+    "import/no-unresolved": "off",
     "no-useless-constructor": "off",
     "class-methods-use-this": "off",
     "@typescript-eslint/no-unused-vars": ["error", {
