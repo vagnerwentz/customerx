@@ -30,7 +30,7 @@ class Contact {
   @JoinColumn({ name: 'telephone_number' })
   telephone_array: Telephone[];
 
-  @ManyToOne(() => Client, client => client.id, { eager: true })
+  @ManyToOne(() => Client, client => client.id)
   @JoinColumn({ name: 'client_id' })
   client: Client;
 

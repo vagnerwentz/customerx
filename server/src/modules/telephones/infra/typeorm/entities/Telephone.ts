@@ -8,6 +8,7 @@ import {
 
 import Client from '@modules/clients/infra/typeorm/entities/Client';
 import Contact from '@modules/contacts/infra/typeorm/entities/Contact';
+import { Exclude } from 'class-transformer';
 
 @Entity('telephones')
 class Telephone {
@@ -18,6 +19,7 @@ class Telephone {
   telephone_number: string;
 
   @Column()
+  @Exclude()
   client_id: string;
 
   @ManyToOne(() => Client, client => client.id)
@@ -25,6 +27,7 @@ class Telephone {
   client: Client;
 
   @Column()
+  @Exclude()
   contact_id: string;
 
   @ManyToOne(() => Contact, contact => contact.id)

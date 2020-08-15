@@ -3,6 +3,7 @@ import { container } from 'tsyringe';
 
 /* Service */
 import AuthenticateUserService from '@modules/admins/services/AuthenticateAdminService';
+import { classToClass } from 'class-transformer';
 
 export default class SessionController {
   public async create(request: Request, response: Response): Promise<Response> {
@@ -15,6 +16,6 @@ export default class SessionController {
       password,
     });
 
-    return response.status(200).json({ admin, token });
+    return response.status(200).json({ admin: classToClass(admin), token });
   }
 }

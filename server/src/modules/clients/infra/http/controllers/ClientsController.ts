@@ -5,14 +5,26 @@ import CreateClientService from '@modules/clients/services/CreateClientService';
 import UpdateClientService from '@modules/clients/services/UpdateClientService';
 import DeleteClientService from '@modules/clients/services/DeleteClientService';
 import ListClientService from '@modules/clients/services/ListClientService';
+import ListOneClientService from '@modules/clients/services/ListOneClientService';
+import { classToClass } from 'class-transformer';
 
 export default class ClientsController {
+  public async show(request: Request, response: Response): Promise<Response> {
+    const { id } = request.params;
+
+    const listClient = container.resolve(ListOneClientService);
+
+    const client = await listClient.execute({ id });
+
+    return response.json({ client: classToClass(client) });
+  }
+
   public async index(request: Request, response: Response): Promise<Response> {
     const listClients = container.resolve(ListClientService);
 
     const clients = await listClients.execute();
 
-    return response.json({ clients });
+    return response.json({ clients: classToClass(clients) });
   }
 
   public async create(request: Request, response: Response): Promise<Response> {

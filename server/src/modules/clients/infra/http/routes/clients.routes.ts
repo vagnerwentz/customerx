@@ -14,6 +14,8 @@ const clientsController = new ClientsController();
 /* Get all clients with the telephones */
 clientsRouter.get('/', clientsController.index);
 
+clientsRouter.get('/:id', clientsController.show);
+
 /* Create a new client */
 clientsRouter.post(
   '/',

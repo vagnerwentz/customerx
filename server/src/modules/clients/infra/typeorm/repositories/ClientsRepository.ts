@@ -26,6 +26,39 @@ class ClientsRepository implements IClientsRepository {
     return client;
   }
 
+  public async findClientWithContacts(id: string): Promise<Client | undefined> {
+    const client = await this.ormRepository.manager.query(`
+    with base as (
+      select distinct clients.id as client_id,
+        clients.name as client_name,
+        clients.email as client_email,
+        clients.telephone as client_telephone,
+        contacts.id as contact_id,
+        contacts.name as contact_name
+      from clients
+        left join contacts
+            on contacts.client_id = clients.id
+        where clients.id = '${id}'
+    ), aggregate_contacts as (
+      select client_id, client_name, client_email, client_telephone,
+             jsonb_agg(
+               case
+                 when contact_id is null then '{}'::jsonb
+                 else jsonb_build_object(
+                    'contact_id', contact_id, 'contact_name', contact_name
+                 )
+               end
+             ) as contacts
+        from base
+       group by client_id, client_name, client_email, client_telephone
+    )
+    select to_jsonb(aggregate_contacts) as result
+      from aggregate_contacts;
+    `);
+
+    return client;
+  }
+
   public async createClient({
     name,
     email,

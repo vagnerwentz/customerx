@@ -7,6 +7,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import Telephone from '@modules/telephones/infra/typeorm/entities/Telephone';
+import Contact from '@modules/contacts/infra/typeorm/entities/Contact';
 
 @Entity('clients')
 class Client {
@@ -27,6 +28,10 @@ class Client {
   })
   @JoinColumn({ name: 'telephone_number' })
   telephone_array: Telephone[];
+
+  @OneToMany(() => Contact, contact => contact.client)
+  @JoinColumn({ name: 'client_id' })
+  contacts_array: Contact[];
 
   @CreateDateColumn()
   created_at: Date;
