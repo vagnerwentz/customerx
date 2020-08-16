@@ -1,5 +1,14 @@
 import React from 'react';
 
-const Dashboard: React.FC = () => <h1>Dashboard</h1>;
+import HeaderVertical from '../../components/HeaderVertical';
+
+const Dashboard: React.FC = () => {
+
+  return (
+    <>
+      <HeaderVertical />
+    </>
+  );
+};
 
 export default Dashboard;

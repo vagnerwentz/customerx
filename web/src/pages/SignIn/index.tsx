@@ -50,13 +50,8 @@ const SignIn: React.FC = () => {
         password: data.password,
       });
 
-      addToast({
-        type: 'success',
-        title: 'Bem vindo',
-        description: 'Estamos felizes que você veio'
-      })
-
       history.push('dashboard');
+
     } catch (err) {
       if (err instanceof Yup.ValidationError) {
         const errors = getValidationErrors(err);

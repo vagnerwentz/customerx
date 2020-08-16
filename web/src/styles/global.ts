@@ -32,7 +32,7 @@ export default createGlobalStyle`
     --color-button-text: #FFFFFF;
     --color-button: #3ed62a;
     --color-button-hover: #77ff95
-    --color-background-input: ##f5f5f5;
+    --color-background-input: #f5f5f5;
     --color-additional: #4a2181;
   }
 `;
