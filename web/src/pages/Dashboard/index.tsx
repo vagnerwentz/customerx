@@ -38,32 +38,40 @@ const Dashboard: React.FC = () => {
   const [numberClients, setNumberClients] = useState(Number);
   const [numberContacts, setNumberContacts] = useState(Number);
 
+  const clientsLength = async () => {
+    const response = await api.get<ClientsResponse>('/clients');
+
+    setNumberClients(response.data.clients.length)
+  }
+
+  const contactsLength = async () => {
+    const response = await api.get<ContactsResponse>('/contacts');
+
+    setNumberContacts(response.data.contacts.length);
+  }
+
   useEffect(() => {
-    api.get<ClientsResponse>('clients').then(response => {
-      setNumberClients(response.data.clients.length)
-    });
-
-    api.get<ContactsResponse>('contacts').then(response => {
-      setNumberContacts(response.data.contacts.length)
-    });
-
-    let chart = am4core.create("chartdiv", am4charts.PieChart);
-
-    chart.legend = new am4charts.Legend();
+    clientsLength();
+    contactsLength();
 
 
-    let series = chart.series.push(new am4charts.PieSeries());
-      series.dataFields.value = "quantity";
-      series.dataFields.category = "clients";
-
-    chart.data = [{
-      "clients": "Clientes",
-      "quantity": numberClients
-    }, {
-      "clients": "Contatos",
-      "quantity": numberContacts
-    }];
   })
+
+  let chart = am4core.create("chartdiv", am4charts.PieChart);
+
+  chart.legend = new am4charts.Legend();
+
+  let series = chart.series.push(new am4charts.PieSeries());
+    series.dataFields.value = "quantity";
+    series.dataFields.category = "clients";
+
+  chart.data = [{
+    "clients": "Clientes",
+    "quantity": numberClients
+  }, {
+    "clients": "Contatos",
+    "quantity": numberContacts
+  }];
 
   return (
     <>
