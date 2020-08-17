@@ -46,7 +46,7 @@ $ yarn start
 $ email: admin@customer.com.br
 $ password: admincustomer
 
-> Após isto, brincar conforme você queira, enjoy :happy:
+> Após isto, brincar conforme você queira, enjoy :smiley:
 ```
 
 ## Anotações
