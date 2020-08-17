@@ -19,13 +19,9 @@ class TelephonesRepository implements ITelephonesRepository {
       where: { client_id: owner_id },
     });
 
-    console.log('getTelephoneClient', getTelephoneClient);
-
     const getTelephoneContact = await this.ormRepository.find({
       where: { contact_id: owner_id, client_id: null },
     });
-
-    console.log('getTelephoneContact', getTelephoneContact);
 
     if (getTelephoneClient.length !== 0) {
       return getTelephoneClient;
