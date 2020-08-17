@@ -3,6 +3,7 @@ import ICreateTelephoneDTO from '../dtos/ICreateTelephoneDTO';
 
 export default interface ITelephonesRepository {
   createTelephoneContact(data: ICreateTelephoneDTO): Promise<Telephone>;
+  getAllTelephones(owner_id: string): Promise<Telephone[] | undefined>;
   createTelephoneClient(data: ICreateTelephoneDTO): Promise<Telephone>;
   findTelephone(telephone: string): Promise<Telephone | undefined>;
   findAllClientsTelephone(): Promise<Telephone[]>;

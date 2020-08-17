@@ -11,6 +11,8 @@ const telephonesController = new TelephonesController();
 
 telephonesRouter.use(ensureAuthenticated);
 
+telephonesRouter.get('/:id', telephonesController.index);
+
 telephonesRouter.post(
   '/',
   celebrate({
@@ -22,6 +24,6 @@ telephonesRouter.post(
   telephonesController.create,
 );
 
-telephonesRouter.delete('/', telephonesController.delete);
+telephonesRouter.delete('/:id/:telephone_number', telephonesController.delete);
 
 export default telephonesRouter;

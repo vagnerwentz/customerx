@@ -36,6 +36,7 @@ contactsRouter.put(
     [Segments.BODY]: {
       name: Joi.string(),
       email: Joi.string().email(),
+      telephone: Joi.string(),
     },
   }),
   contactsController.update,

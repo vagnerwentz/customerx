@@ -8,6 +8,7 @@ interface Request {
   client_id: string;
   name: string;
   email: string;
+  telephone: string;
 }
 
 @injectable()
@@ -20,7 +21,12 @@ class UpdateClientService {
     private contactsRepository: IContactsRepository,
   ) {}
 
-  public async execute({ client_id, name, email }: Request): Promise<Client> {
+  public async execute({
+    client_id,
+    name,
+    email,
+    telephone,
+  }: Request): Promise<Client> {
     const client = await this.clientsRepository.findClient(client_id);
 
     if (!client) {
@@ -45,6 +51,7 @@ class UpdateClientService {
 
     client.name = name;
     client.email = email;
+    client.telephone = telephone;
 
     return this.clientsRepository.saveClient(client);
   }

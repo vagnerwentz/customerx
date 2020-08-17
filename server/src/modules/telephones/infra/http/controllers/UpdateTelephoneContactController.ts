@@ -8,16 +8,16 @@ export default class UpdateTelephoneContactController {
     const { telephone_id, new_telephone } = request.body;
 
     try {
-      const updateClientTelephone = container.resolve(
+      const updateContactTelephone = container.resolve(
         UpdateTelephoneContactService,
       );
 
-      await updateClientTelephone.execute({
+      await updateContactTelephone.execute({
         telephone_id,
         new_telephone,
       });
 
-      return response.status(200).json({ success: 'Client updated' });
+      return response.status(200).json({ success: 'Contact updated' });
     } catch (err) {
       return response.json({ error: err.message });
     }

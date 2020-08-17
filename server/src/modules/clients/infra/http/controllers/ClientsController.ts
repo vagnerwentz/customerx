@@ -47,7 +47,7 @@ export default class ClientsController {
 
   public async update(request: Request, response: Response): Promise<Response> {
     const { id } = request.params;
-    const { name, email } = request.body;
+    const { name, email, telephone } = request.body;
 
     try {
       const updateClient = container.resolve(UpdateClientService);
@@ -55,6 +55,7 @@ export default class ClientsController {
         client_id: id,
         name,
         email,
+        telephone,
       });
 
       return response.status(200).json({ success: 'Client updated' });

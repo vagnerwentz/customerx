@@ -53,14 +53,6 @@ class UpdateContactService {
       throw new AppError('E-mail already in use.', 400);
     }
 
-    const contactWithUpdatedTelephone = await this.telephonesRepository.findTelephone(
-      telephone,
-    );
-
-    if (contactWithUpdatedTelephone) {
-      throw new AppError('Telephone already in use.', 400);
-    }
-
     contact.name = name;
     contact.email = email;
     contact.telephone = telephone;

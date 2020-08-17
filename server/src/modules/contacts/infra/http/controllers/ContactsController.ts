@@ -39,9 +39,9 @@ export default class ContactsController {
     const { name, email, telephone } = request.body;
 
     try {
-      const updateClient = container.resolve(UpdateContactService);
+      const updateContact = container.resolve(UpdateContactService);
 
-      await updateClient.execute({
+      await updateContact.execute({
         contact_id: id,
         name,
         email,
