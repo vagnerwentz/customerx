@@ -1,12 +1,13 @@
 import React, { useCallback, useRef }  from 'react';
-
 import * as Yup from 'yup';
-
 import { Form } from '@unform/web';
 import { FormHandles } from '@unform/core';
+import { useLocation, useHistory } from 'react-router-dom';
 
+/* Icons */
+import { FiPhone } from 'react-icons/fi';
 
-import { FiPhone, FiMail, FiUser} from 'react-icons/fi';
+/* Styles */
 import {
   Container,
   Content
@@ -15,44 +16,54 @@ import {
 /* Utils */
 import getValidationErrors from '../../utils/getValidationError';
 
+/* Toast */
 import { useToast } from '../../hooks/toast';
 
+/* Components */
 import HeaderVertical from '../../components/HeaderVertical';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
+
+/* Api */
 import api from '../../services/api';
 
-interface CreateClientFormData {
-  name: string;
-  email: string;
-  telephone: string;
+interface CreateNewNumberFormData {
+  telephone_number: string;
 }
 
-const CreateClient: React.FC = () => {
+const AddTelephone: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
 
   const { addToast } = useToast();
+  const { state: id } = useLocation();
+  const history = useHistory();
 
-  const handleCreateClient = useCallback(async (data: CreateClientFormData) => {
+  const handleAddNumber = useCallback(async (data: CreateNewNumberFormData) => {
     try {
       formRef.current?.setErrors({});
 
       const schema = Yup.object().shape({
-        name: Yup.string().required('Campo precisa estar preenchido'),
-        email: Yup.string().required('Campo precisa estar preenchido').email('Formato de e-mail inválido'),
-        telephone: Yup.string().required('Telefone obrigatório'),
+        telephone_number: Yup.string().required('Telefone obrigatório'),
       });
 
       await schema.validate(data, {
         abortEarly: false,
       });
 
-      await api.post('clients', data);
+      const { telephone_number } = data;
+
+      await api.post('/telephones', {
+        owner_id: id,
+        telephone_number
+      });
 
       addToast({
         type: 'success',
-        title: 'Cadastro do cliente realizado com sucesso',
+        title: 'Telefone cadastrado com sucesso.',
+        description: 'Eba! Temos mais números'
       })
+
+      history.goBack();
 
     } catch (err) {
       if (err instanceof Yup.ValidationError) {
@@ -61,8 +72,8 @@ const CreateClient: React.FC = () => {
       }
       addToast({
         type: 'error',
-        title: 'Erro na autenticação',
-        description: 'Ocorreu um erro ao tentar cadastrar um cliente.'
+        title: 'Erro ao tentar cadastrar um novo número',
+        description: 'Ocorreu um erro ao tentar cadastrar um novo número, pode ser que ele já existe.'
       });
     }
   }, [addToast]);
@@ -72,30 +83,17 @@ const CreateClient: React.FC = () => {
     <Container>
       <HeaderVertical />
         <Content>
-          <Form ref={formRef} onSubmit={handleCreateClient}>
+          <Form ref={formRef} onSubmit={handleAddNumber}>
 
           <Input
-            name="name"
-            icon={FiUser}
-            placeholder="Nome completo"
-          />
-
-          <Input
-            name="email"
-            type="text"
-            icon={FiMail}
-            placeholder="E-mail"
-          />
-
-          <Input
-            name="telephone"
+            name="telephone_number"
             type="text"
             icon={FiPhone}
             placeholder="Telefone"
           />
 
           <Button type="submit">
-            Cadastrar Cliente
+            Cadastrar Novo Número
           </Button>
 
           </Form>
@@ -105,4 +103,4 @@ const CreateClient: React.FC = () => {
   );
 };
 
-export default CreateClient;
+export default AddTelephone;

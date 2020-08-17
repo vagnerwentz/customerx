@@ -11,8 +11,22 @@ export const Content = styled.div`
   align-items: center;
   justify-content: center;
   width: 100%;
+
   input {
     width: 400px;
+  }
+
+  span {
+    color: #000;
+  }
+
+  > button {
+    border-radius: 8px;
+    border: none;
+
+    svg {
+      background: #77ff95
+    }
   }
 `;
 

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef }  from 'react';
 import * as Yup from 'yup';
 
 import { FormHandles } from '@unform/core';
+import { useHistory } from 'react-router-dom';
 
 /* Utils */
 import getValidationErrors from '../../utils/getValidationError';
@@ -12,20 +13,23 @@ import {
   Table
 } from './styles';
 
-import { FiTrash } from 'react-icons/fi';
+import { FiTrash, FiPlusCircle } from 'react-icons/fi';
 import { GrPhone, GrEdit, GrList } from 'react-icons/gr';
 
 import HeaderVertical from '../../components/HeaderVertical';
 import api from '../../services/api';
 import { useToast } from '../../hooks/toast';
 
+
 interface Client {
   id: string;
   name: string;
   email: string;
   telephone: string;
+  telephone_array: { id: string; telephone_number: string}[];
   created_at: string;
 }
+
 
 interface ClientsResponse {
   clients: Client[];
@@ -35,9 +39,9 @@ const ListAllClients: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
 
   const { addToast } = useToast();
+  const history = useHistory();
 
   const [clients, setClients] = useState<Client[]>([]);
-
 
   /* Load all clients */
   useEffect(() => {
@@ -76,9 +80,35 @@ const ListAllClients: React.FC = () => {
       });
     }
 
-
     const filteredClients = clients.filter(client => client.id !== id);
     setClients(filteredClients);
+  }
+
+  async function moveToEditClient(client: Client): Promise<void> {
+    history.push({
+      pathname: `/edit-client/${client.id}`,
+      state: [client.telephone_array[0].id, client] }
+    );
+  }
+
+  async function moveToAddAndShowTelephones(client: Client): Promise<void> {
+    history.push({
+      pathname: `/add-show-telephones/${client.id}`,
+    });
+  }
+
+  async function moveToAddANewContact(id: string): Promise<void> {
+    history.push({
+      pathname: '/add-contact',
+      state: id,
+    })
+  }
+
+  async function moveToContactsList(id: string): Promise<void> {
+    history.push({
+      pathname: '/list-contacts-clients',
+      state: id,
+    })
   }
 
   return (
@@ -115,14 +145,28 @@ const ListAllClients: React.FC = () => {
                 <td>
                   <button
                     type="button"
+                    onClick={() => moveToEditClient(client)}
                   >
                     <GrEdit size={30} />
                   </button>
 
-                  <button>
+                  <button
+                    type="button"
+                    onClick={() => moveToContactsList(client.id)}
+                  >
                     <GrList size={30} />
                   </button>
-                  <button>
+
+                  <button
+                    type="button"
+                    onClick={() => moveToAddANewContact(client.id)}
+                  >
+                    <FiPlusCircle size={30}/>
+                  </button>
+
+                  <button
+                    onClick={() => moveToAddAndShowTelephones(client)}
+                  >
                     <GrPhone size={30} />
                   </button>
                   <button onClick={() => handleDeleteClient(client.id)}>

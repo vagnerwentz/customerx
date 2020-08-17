@@ -4,6 +4,7 @@ import * as Yup from 'yup';
 
 import { Form } from '@unform/web';
 import { FormHandles } from '@unform/core';
+import { useHistory } from 'react-router-dom';
 
 
 import { FiPhone, FiMail, FiUser} from 'react-icons/fi';
@@ -21,38 +22,67 @@ import HeaderVertical from '../../components/HeaderVertical';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
 import api from '../../services/api';
+import { useParams, useLocation } from 'react-router-dom';
 
-interface CreateClientFormData {
+interface UpdateClientFormData {
+  name: string;
+  email: string;
+  telephone: string;
+  new_telephone: string;
+}
+
+interface Client {
+  id: string;
   name: string;
   email: string;
   telephone: string;
 }
 
-const CreateClient: React.FC = () => {
+const UpdateClient: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
 
-  const { addToast } = useToast();
+  const { id } = useParams();
+  const { state } = useLocation();
 
-  const handleCreateClient = useCallback(async (data: CreateClientFormData) => {
+  const { addToast } = useToast();
+  const history = useHistory();
+
+  const handleUpdateClient = useCallback(async (data: UpdateClientFormData) => {
     try {
       formRef.current?.setErrors({});
 
       const schema = Yup.object().shape({
-        name: Yup.string().required('Campo precisa estar preenchido'),
-        email: Yup.string().required('Campo precisa estar preenchido').email('Formato de e-mail inválido'),
-        telephone: Yup.string().required('Telefone obrigatório'),
+        name: Yup.string(),
+        email: Yup.string().email('Formato de e-mail inválido'),
+        new_telephone: Yup.string(),
       });
 
       await schema.validate(data, {
         abortEarly: false,
       });
 
-      await api.post('clients', data);
+      const { name, email, new_telephone } = data;
+
+      const telephone_id = state[0];
+
+      await api.put(`/update-telephone-client`, {
+        telephone_id,
+        new_telephone
+      });
+
+      await api.put(`/clients/${id}`, {
+        name,
+        email,
+        telephone: new_telephone,
+      });
 
       addToast({
         type: 'success',
-        title: 'Cadastro do cliente realizado com sucesso',
+        title: 'Atualização do cliente realizado com sucesso',
+        description: 'Inforamações do cliente atualizadas.',
       })
+
+      history.goBack();
 
     } catch (err) {
       if (err instanceof Yup.ValidationError) {
@@ -61,8 +91,8 @@ const CreateClient: React.FC = () => {
       }
       addToast({
         type: 'error',
-        title: 'Erro na autenticação',
-        description: 'Ocorreu um erro ao tentar cadastrar um cliente.'
+        title: 'Erro na atualização',
+        description: 'Ocorreu um erro ao tentar editar um cliente.'
       });
     }
   }, [addToast]);
@@ -72,7 +102,11 @@ const CreateClient: React.FC = () => {
     <Container>
       <HeaderVertical />
         <Content>
-          <Form ref={formRef} onSubmit={handleCreateClient}>
+          <Form ref={formRef} onSubmit={handleUpdateClient} initialData={{
+            name: state[1].name,
+            email: state[1].email,
+            new_telephone: state[1].telephone
+          }}>
 
           <Input
             name="name"
@@ -88,14 +122,14 @@ const CreateClient: React.FC = () => {
           />
 
           <Input
-            name="telephone"
+            name="new_telephone"
             type="text"
             icon={FiPhone}
             placeholder="Telefone"
           />
 
           <Button type="submit">
-            Cadastrar Cliente
+            Editar Cliente
           </Button>
 
           </Form>
@@ -105,4 +139,4 @@ const CreateClient: React.FC = () => {
   );
 };
 
-export default CreateClient;
+export default UpdateClient;

@@ -1,12 +1,11 @@
 import React, { useCallback, useRef }  from 'react';
-
+import { useLocation } from 'react-router-dom';
 import * as Yup from 'yup';
-
 import { Form } from '@unform/web';
 import { FormHandles } from '@unform/core';
 
+import { FiPhone, FiMail, FiUser, FiCommand} from 'react-icons/fi';
 
-import { FiPhone, FiMail, FiUser} from 'react-icons/fi';
 import {
   Container,
   Content
@@ -22,36 +21,48 @@ import Input from '../../components/Input';
 import Button from '../../components/Button';
 import api from '../../services/api';
 
-interface CreateClientFormData {
+interface AddContactFormData {
   name: string;
   email: string;
   telephone: string;
 }
 
-const CreateClient: React.FC = () => {
+const AddContact: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
+
+  const { state } = useLocation();
+
+  console.log(state);
 
   const { addToast } = useToast();
 
-  const handleCreateClient = useCallback(async (data: CreateClientFormData) => {
+  const handleAddContact = useCallback(async (data: AddContactFormData) => {
     try {
       formRef.current?.setErrors({});
 
       const schema = Yup.object().shape({
-        name: Yup.string().required('Campo precisa estar preenchido'),
-        email: Yup.string().required('Campo precisa estar preenchido').email('Formato de e-mail inválido'),
-        telephone: Yup.string().required('Telefone obrigatório'),
+        name: Yup.string().required('Nome do contato obrigatório'),
+        email: Yup.string().email('Formato de e-mail inválido.').required('E-mail obrigatório'),
+        telephone: Yup.string().required('Telefone obrigatório.')
       });
 
       await schema.validate(data, {
         abortEarly: false,
       });
 
-      await api.post('clients', data);
+      const { name, email, telephone } = data;
+
+      await api.post('/contacts', {
+        name,
+        email,
+        telephone,
+        client_id: state
+      });
 
       addToast({
         type: 'success',
-        title: 'Cadastro do cliente realizado com sucesso',
+        title: 'Cadastro de contato realizado com sucesso',
+        description: 'Cadastro realizado.',
       })
 
     } catch (err) {
@@ -61,8 +72,8 @@ const CreateClient: React.FC = () => {
       }
       addToast({
         type: 'error',
-        title: 'Erro na autenticação',
-        description: 'Ocorreu um erro ao tentar cadastrar um cliente.'
+        title: 'Erro ao cadastrar contato, cheque os dados.',
+        description: 'Ocorreu um erro ao tentar criar um contato.'
       });
     }
   }, [addToast]);
@@ -72,12 +83,21 @@ const CreateClient: React.FC = () => {
     <Container>
       <HeaderVertical />
         <Content>
-          <Form ref={formRef} onSubmit={handleCreateClient}>
+          <Form ref={formRef} onSubmit={handleAddContact} initialData={{
+            id: state,
+          }}>
+
+          <Input
+            name="id"
+            icon={FiCommand}
+            placeholder="ID"
+            readOnly
+          />
 
           <Input
             name="name"
             icon={FiUser}
-            placeholder="Nome completo"
+            placeholder="Nome do contato"
           />
 
           <Input
@@ -95,7 +115,7 @@ const CreateClient: React.FC = () => {
           />
 
           <Button type="submit">
-            Cadastrar Cliente
+            Cadastrar contato
           </Button>
 
           </Form>
@@ -105,4 +125,4 @@ const CreateClient: React.FC = () => {
   );
 };
 
-export default CreateClient;
+export default AddContact;

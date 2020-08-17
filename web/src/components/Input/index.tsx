@@ -5,7 +5,6 @@ import { useField } from '@unform/core';
 
 import { Container, Error } from './styles';
 
-import ToolTip from '../ToolTip';
 import { FiAlertCircle } from 'react-icons/fi';
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {

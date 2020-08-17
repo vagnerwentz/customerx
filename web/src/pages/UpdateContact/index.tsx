@@ -21,37 +21,59 @@ import HeaderVertical from '../../components/HeaderVertical';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
 import api from '../../services/api';
+import { useParams, useLocation } from 'react-router-dom';
 
-interface CreateClientFormData {
+interface UpdateContactFormData {
   name: string;
   email: string;
   telephone: string;
+  new_telephone: string;
 }
 
-const CreateClient: React.FC = () => {
+
+const UpdateContact: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
+
+  const { id } = useParams();
+  const { state } = useLocation();
 
   const { addToast } = useToast();
 
-  const handleCreateClient = useCallback(async (data: CreateClientFormData) => {
+  const handleUpdateContact = useCallback(async (data: UpdateContactFormData) => {
     try {
       formRef.current?.setErrors({});
 
       const schema = Yup.object().shape({
-        name: Yup.string().required('Campo precisa estar preenchido'),
-        email: Yup.string().required('Campo precisa estar preenchido').email('Formato de e-mail inválido'),
-        telephone: Yup.string().required('Telefone obrigatório'),
+        name: Yup.string(),
+        email: Yup.string().email('Formato de e-mail inválido'),
+        new_telephone: Yup.string(),
       });
 
       await schema.validate(data, {
         abortEarly: false,
       });
 
-      await api.post('clients', data);
+      const { name, email, new_telephone } = data;
+
+      console.log(new_telephone);
+
+      const telephone_id = state[0];
+
+      await api.put(`/update-telephone-contact`, {
+        telephone_id,
+        new_telephone
+      });
+
+      await api.put(`/contacts/${id}`, {
+        name,
+        email,
+        telephone: new_telephone,
+      });
 
       addToast({
         type: 'success',
-        title: 'Cadastro do cliente realizado com sucesso',
+        title: 'Atualização do contato realizado com sucesso',
+        description: 'Inforamações do contato atualizadas.',
       })
 
     } catch (err) {
@@ -61,8 +83,8 @@ const CreateClient: React.FC = () => {
       }
       addToast({
         type: 'error',
-        title: 'Erro na autenticação',
-        description: 'Ocorreu um erro ao tentar cadastrar um cliente.'
+        title: 'Erro na atualização',
+        description: 'Ocorreu um erro ao tentar editar um contato.'
       });
     }
   }, [addToast]);
@@ -72,7 +94,11 @@ const CreateClient: React.FC = () => {
     <Container>
       <HeaderVertical />
         <Content>
-          <Form ref={formRef} onSubmit={handleCreateClient}>
+          <Form ref={formRef} onSubmit={handleUpdateContact} initialData={{
+            name: state[1].name,
+            email: state[1].email,
+            new_telephone: state[1].telephone
+          }}>
 
           <Input
             name="name"
@@ -88,14 +114,14 @@ const CreateClient: React.FC = () => {
           />
 
           <Input
-            name="telephone"
+            name="new_telephone"
             type="text"
             icon={FiPhone}
             placeholder="Telefone"
           />
 
           <Button type="submit">
-            Cadastrar Cliente
+            Editar Contato
           </Button>
 
           </Form>
@@ -105,4 +131,4 @@ const CreateClient: React.FC = () => {
   );
 };
 
-export default CreateClient;
+export default UpdateContact;

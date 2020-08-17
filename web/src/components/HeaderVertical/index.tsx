@@ -1,10 +1,11 @@
 import React from 'react';
 
-import { FiPower, FiUser, FiList } from 'react-icons/fi';
+import { FiPower, FiUser, FiList, FiSlack } from 'react-icons/fi';
 import {
   Container,
   VerticalHeader,
   FooterHeader,
+  DashboardContent,
   AnimationContainer,
   HeaderContent,
   ClientContent,
@@ -12,8 +13,23 @@ import {
 } from './styles';
 
 import { useAuth } from '../../hooks/auth';
+import { useHistory } from 'react-router-dom';
 
 const HeaderVertical: React.FC = () => {
+
+  const history = useHistory();
+
+  function handleToGoToDashboard() {
+    history.push('/dashboard');
+  }
+
+  function handleToGoClients() {
+    history.push('/clients-dashboard');
+  }
+
+  function handleToGoContacts() {
+    history.push('/contacts-dashboard');
+  }
 
   const { signOut } = useAuth();
 
@@ -22,15 +38,29 @@ const HeaderVertical: React.FC = () => {
       <AnimationContainer>
         <VerticalHeader>
           <HeaderContent>
+            <DashboardContent>
+              <button
+                type="button"
+                onClick={handleToGoToDashboard}>
+              <FiSlack size={45} />
+              </button>
+              <span>Dashboard</span>
+            </DashboardContent>
+
             <ClientContent>
-              <button>
-                <FiUser size={45} />
+              <button
+                type="button"
+                onClick={handleToGoClients}>
+              <FiUser size={45} />
               </button>
               <span>Clientes</span>
             </ClientContent>
 
             <ContactContent>
-              <button>
+              <button
+                type="button"
+                onClick={handleToGoContacts}
+              >
                 <FiList size={45} />
               </button>
               <span>Contatos</span>
@@ -44,43 +74,6 @@ const HeaderVertical: React.FC = () => {
           </FooterHeader>
         </VerticalHeader>
       </AnimationContainer>
-      {/* <ContainerClient>
-        <Card>
-          <button>
-            <Cards>
-              <FiUserPlus size={30} color="#000"/>
-              <h1> Criar cliente</h1>
-            </Cards>
-          </button>
-
-          <button>
-            <Cards>
-              <FiUserMinus size={30} color="#000" />
-              <h1> Deletar cliente</h1>
-            </Cards>
-          </button>
-
-          <button>
-            <Cards>
-              <FiEdit size={30} color="#000" />
-              <h1> Atualizar cliente</h1>
-            </Cards>
-          </button>
-
-          <button>
-            <Cards>
-              <FiList size={30} color="#000" />
-              <h1> Listar clientes</h1>
-            </Cards>
-          </button>
-
-          <button>
-            <Cards>
-              <h1> Listar cliente</h1>
-            </Cards>
-          </button>
-        </Card>
-      </ContainerClient> */}
     </Container>
   );
 };

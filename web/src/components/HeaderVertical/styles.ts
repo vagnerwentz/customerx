@@ -48,7 +48,7 @@ export const HeaderContent = styled.div`
   position: absolute;
 `;
 
-export const ClientContent = styled.div`
+export const DashboardContent = styled.div`
   display: flex;
   flex-direction: column;
   position: relative;
@@ -69,7 +69,7 @@ export const ClientContent = styled.div`
   }
 `;
 
-export const ContactContent = styled.div`
+export const ClientContent = styled.div`
   display: flex;
   flex-direction: column;
   position: relative;
@@ -90,46 +90,23 @@ export const ContactContent = styled.div`
   }
 `;
 
-export const ContainerClient = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  border: none;
-`;
-
-export const Card = styled.div`
-  display: grid;
-  grid-template-columns: repeat(5, 300px);
-  grid-auto-rows: auto;
-  grid-gap: 10px;
-  justify-content: center;
-  align-items: center;
-  background: #fff;
-
-  button {
-    border-radius: 50px;
-    border: none;
-
-    &:hover {
-      transition: 0.8s;
-      background: #4a2178;
-    }
-  }
-`;
-
-export const Cards = styled.div`
+export const ContactContent = styled.div`
   display: flex;
   flex-direction: column;
+  position: relative;
   justify-content: center;
+  top: 300px;
+  left: 100px;
 
-  border: 2px solid #e7e7e7;
-  border-radius: 50px;
+  button {
+    background: none;
+    border: 0;
 
-
-  padding: 5rem;
-
-  h1 {
-    color: #000;
+    svg {
+      &:hover {
+        color: #77ff95;
+        transition: 0.2s;
+      }
+    }
   }
 `;
