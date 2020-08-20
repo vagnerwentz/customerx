@@ -46,6 +46,10 @@ $ yarn start
 $ email: admin@customer.com.br
 $ password: admincustomer
 
+> Verificar o arquivo auth.ts em server/src/config/auth.ts
+> E caso após 7 dias, entrar no MD5 on-line e gerar um HASH
+> e colocar no lugar do secret 
+
 > Após isto, brincar conforme você queira, enjoy :smiley:
 ```
 
