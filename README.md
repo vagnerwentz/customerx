@@ -22,7 +22,7 @@ $ git clone https://github.com/vagnerwentz/customerx.git
 > Após a instalação, devemos acessar a pasta server e rodar o comando abaixo para instalar as dependências.
 $ yarn
 
-> Acessar a pasta para instalar as dependências.
+> Acessar a pasta web para instalar as dependências.
 $ yarn
 
 > Logo as instalações devemos ter uma GUI para o banco de dados, no meu caso foi usado o DBeaver.
