@@ -32,7 +32,7 @@ Para você configurar do seu jeito, basta acessar o arquivo ormconfig.json no se
 $ yarn typeorm migration:run
 
 > Criar um seed na tabela de administrador para termos acesso no front-end, ou back-end via Insomnia ou Postman.
-$ yarn typeorm seed:run
+$ yarn seed:run
 
 > Caso queira verificar no banco de dados se tudo ocorreu bem!
 
